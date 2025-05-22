@@ -37,7 +37,8 @@ public class PlayerController : MonoBehaviour
         moveInput = Input.GetAxisRaw("Horizontal");
         RotateVisual();
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        // 점프 가능한 상태에서만 입력 받기
+        if (Input.GetKeyDown(KeyCode.Space) && (isGrounded || currentJumpForce > 0f))
         {
             jumpRequested = true;
         }
@@ -56,7 +57,7 @@ public class PlayerController : MonoBehaviour
             // 살짝 띄워서 충돌 방지
             transform.position += transform.up * 0.05f;
 
-            rb.velocity = transform.up.normalized * currentJumpForce;
+            rb.linearVelocity = transform.up.normalized * currentJumpForce;
 
             jumpCount++;
             currentJumpForce = Mathf.Max(0f, initialJumpForce - jumpDecay * jumpCount);
@@ -67,7 +68,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // 착지 시 점프 상태 초기화
-        if (isGrounded && rb.velocity.magnitude < 0.1f && isJumping)
+        if (isGrounded && rb.linearVelocity.magnitude < 0.1f && isJumping)
         {
             isJumping = false;
             jumpCount = 0;
@@ -83,7 +84,7 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
-        rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
+        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
     }
 
     void RotateVisual()
